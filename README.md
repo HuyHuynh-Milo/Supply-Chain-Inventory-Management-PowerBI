@@ -20,11 +20,129 @@ Businesses often struggle to maintain optimal inventory levels due to a lack of 
 ## 📂 2. Dataset Description & Data Structure
 **🗃️ Raw Dataset**
 - This is a dataset of an imaginary e-commerce company named *Adventure Works*, they sells bicycles and things related to sport.
-- The dataset is in the Google cloud service, to get the data, use *Google BigQuery*. Check for it:
+- The dataset is in the Google Cloud Service. To get the data, use *Google BigQuery*. Check for it:
   - [BigQuery Plaform](https://cloud.google.com/bigquery/docs/sandbox)
-- This is a very massive dataset with several tables contain information about sales, customers, employees, manufacutures, etc. Connect to each other using ***keys***.
+- This is a very massive dataset with several tables containing information about sales, customers, employees, manufacutures, etc. Connect to each other using ***keys***.
 - An exemple for the dataset conection:
 
   <img width="824" height="796" alt="image" src="https://github.com/user-attachments/assets/d1ed601d-72c5-4930-a1f5-e4e9c2312360" />
 
-- But for this project i'll have some step to extract, transform and load the dataset to get the necessary information only. **Product, Inventory, Category, WorkOrder and SaleOrder** are the main tables that will be used for this report.
+- But for this project, I'll have some steps to extract, transform, and load the dataset to get the necessary information only.
+- 5 tables: **Product, Inventory, Category, WorkOrder, and SaleOrder** are the main tables that will be used for this report.
+
+**📩 Get Data**
+- To synthesize 5 tables i mentioned before, some SQL functions  will be used on the Google BigQuery
+```SQL
+# Query Product Table
+SELECT ProductID, Name, 
+       SafetyStockLevel,
+       ReorderPoint, StandardCost, 
+       DaysToManufacture, FinishedGoodsFlag,
+       ProductSubcategoryID
+FROM `adventureworks2019.Production.Product`
+;
+
+# Query Category Table 
+SELECT 
+       ps.ProductSubcategoryID, 
+       ps.Name AS Subcategory,
+       ps.ProductCategoryID,
+       pc.Name AS Category
+From `adventureworks2019.Production.ProductSubcategory` AS ps
+JOIN `adventureworks2019.Production.ProductCategory` AS pc 
+ON ps.ProductCategoryID = pc.ProductCategoryID
+;
+
+# Query WorkOrder Table
+SELECT ProductID, WorkOrderID, 
+       OrderQty, StartDate, 
+       EndDate, DueDate
+FROM `adventureworks2019.Production.WorkOrder`
+;
+
+# Query Inventory Table
+SELECT pi.ProductID,
+       pi.LocationID,
+       pi.Quantity,
+       pl.Name AS Location,
+       pi.ModifiedDate 
+FROM `adventureworks2019.Production.ProductInventory` AS pi 
+JOIN `adventureworks2019.Production.Location` AS pl 
+ON pi.LocationID = pl.LocationID
+;
+
+# Query SaleOrder Table
+SELECT sd.SalesOrderDetailID,
+       sh.SalesOrderID,
+       sh.OrderDate,
+       sh.SubTotal AS SubTotal_Order,
+       sd.ProductID,
+       sd.OrderQty,
+       sd.UnitPrice,
+       sd.LineTotal AS LineTotal_Product
+FROM `adventureworks2019.Sales.SalesOrderHeader` AS sh
+JOIN `adventureworks2019.Sales.SalesOrderDetail` AS sd
+ON sh.SalesOrderID = sd.SalesOrderID
+ORDER BY sd.SalesOrderDetailID
+;
+```
+
+**📬 Using Dataset**
+
+A quick overview of these tables:
+- **Product** table:
+
+| Column Name              | Data Type          | Description                                                                                                                          | Example Value            |
+| ------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| **ProductID**            | `int`              | Unique identifier for each product in the database. Serves as the primary key for the table.                                         | 707                      |
+| **Name**                 | `nvarchar(50)`     | The name of the product, typically used in listings and reports.                                                                     | *Mountain-200 Black, 42* |
+| **SafetyStockLevel**     | `int`              | The minimum quantity of the product that should be kept in inventory to prevent stockouts.                                           | 500                      |
+| **ReorderPoint**         | `int`              | The inventory level that triggers a new purchase or production order. When stock drops below this point, replenishment should begin. | 375                      |
+| **StandardCost**         | `money`            | The manufacturing or purchasing cost of one unit of the product (not the selling price). Used for cost accounting and valuation.     | 594.83                   |
+| **DaysToManufacture**    | `int`              | The average number of days required to manufacture the product. Used for production planning and lead time analysis.                 | 4                        |
+| **FinishedGoodsFlag**    | `int`              | Indicates whether the product is a finished good (`1`) or a component/sub-assembly (`0`).                                            | 1                        |
+| **ProductSubcategoryID** | `int` *(nullable)* | References the product’s subcategory in the `Production.ProductSubcategory` table. Helps group products by type.                     | 14                       |
+
+- **Category** table:
+
+| Column Name                           | Data Type      | Description                                                                                                                                                              | Example Value    |
+| ------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
+| **ProductSubcategoryID**              | `int`          | Unique identifier for each product subcategory. Serves as the primary key in the `ProductSubcategory` table and a foreign key in `Product` (via `ProductSubcategoryID`). | 14               |
+| **Subcategory** *(alias for ps.Name)* | `nvarchar(50)` | The name of the product subcategory (e.g., “Mountain Bikes”, “Helmets”).                                                                                                 | *Mountain Bikes* |
+| **ProductCategoryID**                 | `int`          | Foreign key linking the subcategory to its parent category in the `ProductCategory` table.                                                                               | 1                |
+| **Category** *(alias for pc.Name)*    | `nvarchar(50)` | The name of the higher-level product category (e.g., “Bikes”, “Accessories”).                                                                                            | *Bikes*          |
+
+- **WorkOrder** Table:
+
+| Column Name     | Data Type               | Description                                                                                       | Example Value       |
+| --------------- | ----------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
+| **ProductID**   | `int`                   | Foreign key referencing the product being manufactured (links to `Production.Product.ProductID`). | 707                 |
+| **WorkOrderID** | `int`                   | Unique identifier for each work order — the primary key of the table.                             | 51234               |
+| **OrderQty**    | `int`                   | The total quantity of the product that is scheduled to be manufactured in this work order.        | 100                 |
+| **StartDate**   | `datetime`              | The date when production on the work order actually started.                                      | 2020-07-12 00:00:00 |
+| **EndDate**     | `datetime` *(nullable)* | The date when production was completed. May be `NULL` if the work order is still in progress.     | 2020-07-20 00:00:00 |
+| **DueDate**     | `datetime`              | The planned completion date for the work order, used to track delays or early completions.        | 2020-07-22 00:00:00 |
+
+- **Inventory** Table:
+
+| Column Name                        | Data Type      | Description                                                                                                             | Example Value            |
+| ---------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| **ProductID**                      | `int`          | Foreign key referencing the product in `Production.Product`. Identifies which product this inventory record belongs to. | 707                      |
+| **LocationID**                     | `smallint`     | Foreign key referencing the warehouse or storage location in `Production.Location`.                                     | 6                        |
+| **Quantity**                       | `smallint`     | Number of units of the product currently in stock at that specific location.                                            | 254                      |
+| **Location** *(alias for pl.Name)* | `nvarchar(50)` | Descriptive name of the inventory location, such as a warehouse or sub-assembly area.                                   | *Finished Goods Storage* |
+| **ModifiedDate**                   | `datetime`     | Date and time when this inventory record was last updated — used for tracking stock changes.                            | 2020-09-12 00:00:00      |
+
+- **SaleOrder** Table:
+
+| Column Name                                      | Data Type       | Description                                                                                                              | Example Value       |
+| ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------- |
+| **SalesOrderDetailID**                           | `int`           | Unique identifier for each line item within a sales order. Serves as the primary key in `SalesOrderDetail`.              | 110563              |
+| **SalesOrderID**                                 | `int`           | Foreign key linking the detail line to the sales order header. Used to group multiple products under one customer order. | 43659               |
+| **OrderDate**                                    | `datetime`      | Date when the sales order was created. Useful for analyzing time-based trends and seasonality.                           | 2020-08-12 00:00:00 |
+| **SubTotal_Order** *(alias for sh.SubTotal)*     | `money`         | The total amount for the entire sales order before tax, shipping, and discounts.                                         | 1,890.50            |
+| **ProductID**                                    | `int`           | Foreign key referencing the product sold, linking to `Production.Product`.                                               | 707                 |
+| **OrderQty**                                     | `smallint`      | Quantity of the product ordered in this line item.                                                                       | 3                   |
+| **UnitPrice**                                    | `money`         | The price per unit of the product at the time of sale.                                                                   | 594.83              |
+| **LineTotal_Product** *(alias for sd.LineTotal)* | `numeric(38,6)` | The total price for this line item (calculated as `OrderQty × UnitPrice`, adjusted for any discounts).                   | 1,784.49            |
+
