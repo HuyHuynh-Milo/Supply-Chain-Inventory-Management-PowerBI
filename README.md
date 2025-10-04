@@ -18,7 +18,7 @@ Businesses often struggle to maintain optimal inventory levels due to a lack of 
 - Businesses seeking a data-driven approach to track inventory value, identify slow-moving items.
 
 ## 📂 2. Dataset Description & Data Structure
-**🗃️ Raw Dataset**
+### 🗃️ Raw Dataset
 - This is a dataset of an imaginary e-commerce company named *Adventure Works*, they sells bicycles and things related to sport.
 - The dataset is in the Google Cloud Service. To get the data, use *Google BigQuery*. Check for it:
   - [BigQuery Plaform](https://cloud.google.com/bigquery/docs/sandbox)
@@ -30,7 +30,7 @@ Businesses often struggle to maintain optimal inventory levels due to a lack of 
 - But for this project, I'll have some steps to extract, transform, and load the dataset to get the necessary information only.
 - 5 tables: **Product, Inventory, Category, WorkOrder, and SaleOrder** are the main tables that will be used for this report.
 
-**📩 Get Data**
+### 📩 Get Data
 - To synthesize 5 tables i mentioned before, some SQL functions  will be used on the Google BigQuery
 ```SQL
 # Query Product Table
@@ -87,7 +87,7 @@ ORDER BY sd.SalesOrderDetailID
 ;
 ```
 
-**📬 Using Dataset**
+### 📬 Using Dataset
 
 A quick overview of these tables:
 - **Product** table:
@@ -145,4 +145,38 @@ A quick overview of these tables:
 | **OrderQty**                                     | `smallint`      | Quantity of the product ordered in this line item.                                                                       | 3                   |
 | **UnitPrice**                                    | `money`         | The price per unit of the product at the time of sale.                                                                   | 594.83              |
 | **LineTotal_Product** *(alias for sd.LineTotal)* | `numeric(38,6)` | The total price for this line item (calculated as `OrderQty × UnitPrice`, adjusted for any discounts).                   | 1,784.49            |
+
+- The Product table is the main table that connects to 3 other tables by the key ***ProductID***. With an exception for the category table, they are connected by the **ProductSubcategoryID**
+## 3. Main process in Power BI
+### 1. ⚒️ Preprocessing Data
+**a. Dataset & Preprocessing explanation**
+- This dataset doesn't have the stock quantity during the time period, so i'll hypothesize that the dataset ends its record on 31-May and the calculations like Stock Quantity, Value, Status,... are at that time.
+- Every calculation after the end of May (like work order) is my Forecast for future demand.
+
+**b. Inventory Turnover**
+- The Inventory Turnover is gonna be calculated by approximation (due to the lack of stock quantity for the time period):
+
+  <img width="427" height="77" alt="image" src="https://github.com/user-attachments/assets/e6ce4999-a075-4fe5-82fd-fd66ddd039a0" />
+  
+```DAX
+InventoryTurnOver = 
+VAR COGS = CALCULATE(
+    SUMX(SaleOrder, SaleOrder[OrderQty]*RELATED('Product'[StandardCost])),
+    FILTER(SaleOrder,SaleOrder[OrderDate] >= DATE(2014,5,1) && 
+           SaleOrder[OrderDate]  < DATE(2014,6,1))
+    )
+RETURN DIVIDE(COGS,[InventValue])
+```
+
+**c. Stock Status**
+- At Stock is the range of item quantity from Safety Stock -> SafetyStock * 1.3
+- Excess-Stock is everything above the Maximum At-Stock
+- Below safety are everything below the safety point.
+
+**d. Table Connection**
+- I create a calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
+
+<img width="849" height="703" alt="image" src="https://github.com/user-attachments/assets/5d1f94d9-3f22-4c75-90c1-1effc7d93475" />
+
+### 2. 
 
