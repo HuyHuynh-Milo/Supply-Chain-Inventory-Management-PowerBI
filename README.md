@@ -25,7 +25,8 @@ Businesses often struggle to maintain optimal inventory levels due to a lack of 
 - This is a very massive dataset with several tables containing information about sales, customers, employees, manufacutures, etc. Connect to each other using ***keys***.
 - An exemple for the dataset conection:
 
-  <img width="824" height="796" alt="image" src="https://github.com/user-attachments/assets/d1ed601d-72c5-4930-a1f5-e4e9c2312360" />
+ <img width="1667" height="1616" alt="image" src="https://github.com/user-attachments/assets/6395e28c-77da-4314-91f5-51a5a41a8840" />
+
 
 - But for this project, I'll have some steps to extract, transform, and load the dataset to get the necessary information only.
 - 5 tables: **Product, Inventory, Category, WorkOrder, and SaleOrder** are the main tables that will be used for this report.
@@ -162,7 +163,7 @@ A quick overview of these tables:
 InventoryTurnOver = 
 VAR COGS = CALCULATE(
     SUMX(SaleOrder, SaleOrder[OrderQty]*RELATED('Product'[StandardCost])),
-    FILTER(SaleOrder,SaleOrder[OrderDate] >= DATE(2014,5,1) && 
+    FILTER(SaleOrder,SaleOrder[OrderDate] >= DATE(2014,1,1) && 
            SaleOrder[OrderDate]  < DATE(2014,6,1))
     )
 RETURN DIVIDE(COGS,[InventValue])
@@ -176,7 +177,12 @@ RETURN DIVIDE(COGS,[InventValue])
 **d. Table Connection**
 - I create a calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
 
-<img width="849" height="703" alt="image" src="https://github.com/user-attachments/assets/5d1f94d9-3f22-4c75-90c1-1effc7d93475" />
+<img width="1663" height="1321" alt="image" src="https://github.com/user-attachments/assets/8ca51742-7638-4345-820b-16e560b50a6a" />
 
-### 2. 
+
+### 2. 📈 Dashboard
+**a. Overview**
+
+<img width="2599" height="1465" alt="image" src="https://github.com/user-attachments/assets/b4574f02-981c-4d26-9155-82eb3603b96c" />
+
 
