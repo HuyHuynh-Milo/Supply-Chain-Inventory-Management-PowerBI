@@ -163,7 +163,7 @@ A quick overview of these tables:
 InventoryTurnOver = 
 VAR COGS = CALCULATE(
     SUMX(SaleOrder, SaleOrder[OrderQty]*RELATED('Product'[StandardCost])),
-    FILTER(SaleOrder,SaleOrder[OrderDate] >= DATE(2014,1,1) && 
+    FILTER(SaleOrder,SaleOrder[OrderDate] >= DATE(2013,6,1) && 
            SaleOrder[OrderDate]  < DATE(2014,6,1))
     )
 RETURN DIVIDE(COGS,[InventValue])
@@ -173,7 +173,17 @@ RETURN DIVIDE(COGS,[InventValue])
 - At Stock is the range of item quantity from Safety Stock -> SafetyStock * 1.3
 - Excess-Stock is everything above the Maximum At-Stock
 - Below safety are everything below the safety point.
-
+- DAX code for stock status:
+```DAX
+StockStatus = 
+    SWITCH(
+        TRUE(),
+        Inventory[Quantity] = 0, "Out Stock",
+        Inventory[Quantity] < RELATED('Product'[SafetyStockLevel]), "Below Safety",
+        Inventory[Quantity] <= RELATED('Product'[SafetyStockLevel])*1.3, "At Stock",
+        "Over Stock"
+        )
+```
 **d. Table Connection**
 - I create a calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
 
@@ -183,6 +193,8 @@ RETURN DIVIDE(COGS,[InventValue])
 ### 2. 📈 Dashboard
 **a. Overview**
 
-<img width="2599" height="1465" alt="image" src="https://github.com/user-attachments/assets/b4574f02-981c-4d26-9155-82eb3603b96c" />
+<img width="1508" height="848" alt="image" src="https://github.com/user-attachments/assets/8a9e3a71-a872-4d76-82e3-8238033643f6" />
 
-
+**Key Observation**
+- Total Revenue: ~ $7.24M, Stock Quantity: ~ 17K
+- 
