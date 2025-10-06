@@ -219,7 +219,7 @@ StockStatus =
 - The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
 
 **3. Interpreting Inventory Turnover**
-- The Overall Inventory turnover stands at** 6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
+- The Overall Inventory turnover stands at **6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
 - Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
 - Overall, a turnover **above 6** indicates that inventory management practices are **effective**, with stock levels well matched to demand. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like Accessories.
 
