@@ -193,8 +193,35 @@ StockStatus =
 ### 2. 📈 Dashboard
 **a. Overview**
 
-<img width="1508" height="848" alt="image" src="https://github.com/user-attachments/assets/8a9e3a71-a872-4d76-82e3-8238033643f6" />
+<img width="2556" height="1424" alt="image" src="https://github.com/user-attachments/assets/24f8dd34-57f0-4667-a14e-b9ba82afeb4d" />
 
-**Key Observation**
-- Total Revenue: ~ $7.24M, Stock Quantity: ~ 17K
-- 
+
+🗝️**Key Observation**
+- Total inventory value: ~$7.24M, Total Items: 151, Total Quantity: 17,319.
+- SKU health: Out of 151 SKUs, 73 SKUs (~48.3%) are below safety stock, 50 SKUs (~33.1%) are overstock, 24 SKUs (~15.9%) are at target, and 4 SKUs (~2.65%) are out of stock.
+- Value concentration: Bikes account for ~$7.06M (≈97.5% of total value)
+- Quantity distribution: Bikes ~44.9% of units, Clothing ~34.9%, Accessories ~22.0%.
+- Working capital needed to refill: Refill value ≈ $2.3M (~31.8% of total inventory value).
+- Excess inventory value: ≈ $177.6K (~2.45% of total) — relatively small versus total value.
+
+🧠**Implication**
+
+**1.Stock-out risk vs. cash constraint tension.**
+- The total inventory asset base comprises 151 individual items totaling a Quantity of 17K units, collectively valued at $7.24M.
+- A minitory of items are maintained at satisfactory stock levels: **24 tiems (15.9%)** At Stock. However, more than **50.9%** of the portfolio is either Below Safety **(73 items)** or Out-stock **(4 items)**.
+ 
+-> This critical imbalance results in a ratio of instability (Below Safety + Out Stock) to stability (At Stock) of 3.04:1 
+- Inventory requirements indicate a necessary capital injection; the "Refill Value" of **$2.3M** represents **31.9%** of the total current inventory valuation.
+
+**2. High financial risk concentrated in bikes**
+- The $7.24M inventory portfolio demonstrates extreme financial concentration, the Bike category constitute majority of asset value: **$7.06M,** or **97.5%**, of the total inventory value.
+- Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder
+- The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
+
+**3. Interpreting Inventory Turnover**
+- The Overall Inventory turnover stands at** 6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
+- Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
+- Overall, a turnover **above 6** indicates that inventory management practices are **effective**, with stock levels well matched to demand. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like Accessories.
+
+**4. Opportunity in overstocked categories.**
+- Clothing and Accessories show high overstock percentages (per-SKU), more than **91%** items are overstock. Yet they represent a tiny portion of total value — good candidates for working-capital recovery through promotions/redistribution.
