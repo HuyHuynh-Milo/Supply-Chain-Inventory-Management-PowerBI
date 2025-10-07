@@ -88,7 +88,7 @@ ORDER BY sd.SalesOrderDetailID
 ;
 ```
 
-### 📬 Using Dataset
+### 📬 Using Dataset (Data Dictionary)
 
 A quick overview of these tables:
 - **Product** table:
@@ -204,33 +204,43 @@ StockStatus =
 - **Working capital needed to replenishment**: Refill value ≈ $2.3M (~31.8% of total inventory value).
 - **Excess inventory value**: ≈ $177.6K (~2.45% of total) — relatively small versus total value.
 
-🧠 **Implication**
+🧠 **Key Insight**
 
-**1.Stock-out risk vs. cash constraint tension.**
+**1.Stock-out risk**
 - The total inventory asset base comprises 151 individual items totaling a Quantity of 17K units, collectively valued at $7.24M.
-- A minitory of items are maintained at satisfactory stock levels: **24 tiems (15.9%)** At Stock. However, more than **50.9%** of the portfolio is either Below Safety **(73 items)** or Out-stock **(4 items)**.
+- A minitory of items are maintained at stock levels: **24 tiems (15.9%)** At Stock. However, more than **50.9%** of the portfolio is either Below Safety **(73 items)** or Out-stock **(4 items)**.
  
--> This critical imbalance results in a ratio of instability (Below Safety + Out Stock) to stability (At Stock) of **3.2:1** 
+-> This critical imbalance results in a ratio of instability **(Below Safety + Out Stock)** to stability **(At Stock)** of **3.2:1** 
 
+**2. Cash-out threat** 
 - Inventory requirements indicate a necessary capital injection; the "Refill Value" of **$2.3M** represents **31.9%** of the total current inventory valuation.
 
 -> The safety stock policy and demand forecast should be adjusted to improve inventory replenishment efficiency.
 
-**2. High financial risk concentrated in bikes**
+**3. High financial risk concentrated in bikes**
 - The $7.24M inventory portfolio demonstrates extreme financial concentration, the Bike category constitute majority of asset value: **$7.06M,** or **97.5%**, of the total inventory value.
-- Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder
-- The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
+- Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder.
+  
+-> The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
 
-**3. Interpreting Inventory Turnover**
+**4. Interpreting Inventory Turnover**
 - The Overall Inventory turnover stands at **6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
 - Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
 - Overall, a turnover **above 6** indicates that inventory management practices are **effective**, with stock levels well matched to demand. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like Accessories.
 
-**4. Opportunity in overstocked categories.**
+**5. Opportunity in overstocked categories.**
 - Clothing and Accessories show high overstock percentages (per-SKU), more than **91%** items are overstock. Yet they represent a tiny portion of total value — good candidates for working-capital recovery through promotions/redistribution.
 
 **B. Availability & Forecast**
 
-<img width="1475" height="828" alt="image" src="https://github.com/user-attachments/assets/0445a8b3-673b-4a90-a517-1c331ee66629" />
+<img width="1513" height="850" alt="image" src="https://github.com/user-attachments/assets/86e40fc7-5f32-46f6-8029-56ecfc0e3716" />
+
+🗝️ **Key Observation**
+
+- **Stock status**: ~48% of SKUs are below safety stock, ~33% are overstock, and only ~16% are “at stock” (out-of-stock is ~2–3%).
+- **Items running out**: Several SKUs are at risk of running out soon: **6 SKUs <10 days**, 18 SKUs in 11–30 days, 33 SKUs in 31–60 days. Needing some attention to get refilled soon
+- Some items like Bike Wash, Short-Sleeve, Water Bottle will run out in just 2 weeks.
+- **Forecast Inventory**: Some items have order quantities beyond the average customer demand in this year, like Rear Deraileur, ML Headset, HL Fork, etc.
+- **Items Quantity**: Several items with the stock at "0", many others cluster around small quantities (30–36), suggesting the item is at-risk or it might be removed from the company sale system.
 
 
