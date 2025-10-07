@@ -238,9 +238,43 @@ StockStatus =
 🗝️ **Key Observation**
 
 - **Stock status**: ~48% of SKUs are below safety stock, ~33% are overstock, and only ~16% are “at stock” (out-of-stock is ~2–3%).
-- **Items running out**: Several SKUs are at risk of running out soon: **6 SKUs <10 days**, 18 SKUs in 11–30 days, 33 SKUs in 31–60 days. Needing some attention to get refilled soon
-- Some items like Bike Wash, Short-Sleeve, Water Bottle will run out in just 2 weeks.
+- **Items running out**: Several SKUs are at risk of running out soon: **6 SKUs <10 days**, 18 SKUs in 11–30 days, 33 SKUs in 31–60 days.
+
+-> Needing some attention to get refilled soon, especially the under 10 days to stock-out, considering the lead time of the Bike industries.
+
+- Some items like Bike Wash, Short-Sleeve, and Water Bottle will run out in just 2 weeks.
+
 - **Forecast Inventory**: Some items have order quantities beyond the average customer demand in this year, like Rear Deraileur, ML Headset, HL Fork, etc.
+
+-> Work Order and Purchase Order quantities must be modified to match the real customer demand this year.
 - **Items Quantity**: Several items with the stock at "0", many others cluster around small quantities (30–36), suggesting the item is at-risk or it might be removed from the company sale system.
 
+🧠 **Key Insight**
+- **Inventory balance is off**: simultaneous understock and overstock indicate safety stock / reorder rules aren’t tuned per SKU.
+- **Customer service risk**: although current out-of-stock % is low, the near-term risk pool could cause service disruptions.
+- **Capital tied in inventory**: overstocked SKUs represent locked capital and will increase if large refills occur.
+- **Forecasts are useful**: the model can detect refill spikes and help avoid surprise capital swings if operationalized.
 
+**C. Excess Storage & Needing Refill**
+
+<img width="1514" height="845" alt="image" src="https://github.com/user-attachments/assets/c4b510a8-2601-4a07-83f4-05c6fab7b692" />
+
+🗝️ **Key Observation**
+
+- Total excess value ≈ $177.6K (2.45% of inventory value) while value needed for refill ≈ $2.33M and missing value = 32.2% → refill needs are much larger than excess value.
+
+- Share of overstock ≈ 33%, understock ≈ 51% — more SKUs are understocked than overstocked.
+
+- Left list: top SKUs contributing to excess value (each ~5–13K).
+
+- Right list: top SKUs requiring the largest refill money (some items need >$100K to refill), and several show %Refill vs At-Stock >200% → big refill spikes relative to current stock.
+
+🧠 **Key Insight**
+
+- Mismatch of capital flow: a relatively small pool of overstock value cannot offset the very large refill needs — purchasing will drive working capital up unless controlled.
+
+- Uneven SKU priorities: top contributors to excess value are not necessarily the ones that require the most refill money; replenishment rules are not aligned to SKU value/velocity.
+
+- Refill spikes risk over-capitalization: items with >200% refill ratio likely come from batch POs or minimum order quantities (case-pack) and will create sudden capital commitments.
+
+- High business risk: the combination of many understocked SKUs and a few large refill amounts raises both stockout risk and sudden cash pressure.
