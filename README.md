@@ -355,7 +355,7 @@ ForecastInvent =
 
 - **Right list**: top SKUs requiring the **largest refill money** (some items need >$100K to refill), and several show %Refill vs At-Stock >200% → **big refill** spikes relative to current stock.
 
-🧠 **Key Insight**
+🧠 **Key Insight & Recommendation**
 
 - **Mismatch of capital flow**: a relatively small pool of overstock value cannot offset the very large refill needs — purchasing will drive working capital up unless controlled.
 
@@ -366,3 +366,5 @@ ForecastInvent =
 -> These items may require better production planning or safety stock recalibration to smooth output and reduce resource burden.
 
 - **High business risk**: the combination of many understocked SKUs and a few large refill amounts raises both stockout risk and sudden cash pressure.
+
+## 3. Conclusion & Recommendation
