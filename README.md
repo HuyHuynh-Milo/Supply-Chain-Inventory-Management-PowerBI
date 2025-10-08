@@ -3,7 +3,7 @@
 ![Cover image](https://github.com/user-attachments/assets/9d4ddbd8-1880-4913-b3aa-a68cc20fea1e)
 - Author: Huy Huynh
 - Date: September 2025
-- Tools: PowerBI, BigQuery, SQL
+- Tools: Power BI, Power Query, BigQuery, SQL
 ## 📝 1. Background & Overview
 📌 **a. Problem Statement**
 Businesses often struggle to maintain optimal inventory levels due to a lack of visibility into stock movements, valuation, and future demand. Inefficient inventory tracking can lead to overstock, stockouts, and inaccurate financial reporting. This project aims to develop an Inventory Tracking System that provides real-time insights into:
@@ -148,7 +148,9 @@ A quick overview of these tables:
 | **LineTotal_Product** *(alias for sd.LineTotal)* | `numeric(38,6)` | The total price for this line item (calculated as `OrderQty × UnitPrice`, adjusted for any discounts).                   | 1,784.49            |
 
 - The Product table is the main table that connects to 3 other tables by the key ***ProductID***. With an exception for the category table, they are connected by the **ProductSubcategoryID**
+
 ## 3. Main process in Power BI
+
 ### 1. ⚒️ Preprocessing Data
 **a. Dataset & Preprocessing explanation**
 - This dataset doesn't have the stock quantity during the time period, so i'll hypothesize that the dataset ends its record on 31-May and the calculations like Stock Quantity, Value, Status,... are at that time.
@@ -170,9 +172,9 @@ RETURN DIVIDE(COGS,[InventValue])
 ```
 
 **c. Stock Status**
-- At Stock is the range of item quantity from Safety Stock -> SafetyStock * 1.3
-- Excess-Stock is everything above the Maximum At-Stock
-- Below safety are everything below the safety point.
+- **At Stock** is the range of item quantity from **Safety Stock -> SafetyStock * 1.3**
+- **Excess-Stock** is everything above the Maximum At-Stock
+- **Below safety** are everything below the safety point.
 - DAX code for stock status:
 ```DAX
 StockStatus = 
@@ -184,8 +186,30 @@ StockStatus =
         "Over Stock"
         )
 ```
-**d. Table Connection**
-- I create a calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
+**d. Excess Value**
+```DAX
+ExcessValue = CALCULATE(
+    SUMX(
+          Inventory, 
+          (Inventory[Quantity] - RELATED('Product'[SafetyStockLevel])*1.3)*RELATED('Product'[StandardCost])),
+    FILTER(Inventory, Inventory[IsOverStock] = 1)
+    )
+```
+**e. Refill Value**
+```DAX
+RefillValue = 
+VAR BelowSafe = CALCULATE(
+    SUMX(Inventory, (RELATED('Product'[SafetyStockLevel]) - Inventory[Quantity])*RELATED('Product'[StandardCost])),
+    FILTER(Inventory,Inventory[IsUnderSafety] = 1)
+    )
+VAR OutStock = CALCULATE(
+    SUMX('Product', 'Product'[SafetyStockLevel]*'Product'[StandardCost]),
+    FILTER(RELATEDTABLE(Inventory), Inventory[Quantity] = 0)
+    )
+RETURN BelowSafe + OutStock
+```
+**f. Table Connection**
+- I create a Calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
 
 <img width="1663" height="1321" alt="image" src="https://github.com/user-attachments/assets/8ca51742-7638-4345-820b-16e560b50a6a" />
 
@@ -204,7 +228,7 @@ StockStatus =
 - **Working capital needed to replenishment**: Refill value ≈ $2.3M (~31.8% of total inventory value).
 - **Excess inventory value**: ≈ $177.6K (~2.45% of total) — relatively small versus total value.
 
-🧠 **Key Insight**
+🧠 **Key Insight & Recommendation**
 
 **1.Stock-out risk**
 - The total inventory asset base comprises 151 individual items totaling a Quantity of 17K units, collectively valued at $7.24M.
@@ -218,7 +242,7 @@ StockStatus =
 -> The safety stock policy and demand forecast should be adjusted to improve inventory replenishment efficiency.
 
 **3. High financial risk concentrated in bikes**
-- The $7.24M inventory portfolio demonstrates extreme financial concentration, the Bike category constitute majority of asset value: **$7.06M,** or **97.5%**, of the total inventory value.
+- The $7.24M inventory portfolio demonstrates extreme financial concentration; the Bike category constitutes the majority of asset value: **$7.06M, or **97.5%** of the total inventory value.
 - Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder.
   
 -> The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
@@ -226,16 +250,80 @@ StockStatus =
 **4. Interpreting Inventory Turnover**
 - The Overall Inventory turnover stands at **6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
 - Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
-- Overall, a turnover **above 6** indicates that inventory management practices are **effective**, with stock levels well matched to demand. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like Accessories.
+
+-> Overall, a turnover **above 6** indicates that inventory management practices are **effective**. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like the Accessories.
 
 **5. Opportunity in overstocked categories.**
-- Clothing and Accessories show high overstock percentages (per-SKU), more than **91%** items are overstock. Yet they represent a tiny portion of total value — good candidates for working-capital recovery through promotions/redistribution.
+- Clothing and Accessories show high overstock percentages (per-SKU), more than **91%** items are overstock.
+
+-> Yet they represent a tiny portion of total value — good candidates for working-capital recovery through promotions/redistribution.
 
 **B. Availability & Forecast**
 
 <img width="1513" height="850" alt="image" src="https://github.com/user-attachments/assets/86e40fc7-5f32-46f6-8029-56ecfc0e3716" />
 
-🗝️ **Key Observation**
+📟 **Inventory Forecast Calculation**
+- To **forecast** several next-day stock levels, the cumulative outbound and inbound must be calculated 
+- First, I calculate the **average daily demand** quantity: divide total demand by total day.
+- The **Cumulative Outbound** = averagedailydemand * number of day
+- The **Cumulative Inbound** = cumulative sum of work order quantity 
+- After that, the forecast = current stock + work order quantity (CumInBound) - average daily demand (CumOutBound)
+
+- **DAX for Average Daily Demand**
+```DAX
+AverageDailyDemand = 
+VAR TotalQty =
+    CALCULATE(
+        SUM ( SaleOrder[OrderQty] ),
+        DATESBETWEEN ( 'Calendar'[Date], DATE(2014,1,1), DATE(2014,5,31) ),
+        REMOVEFILTERS(ForecastCalendar)   -- để không bị context forecast
+    )
+VAR NumDays =
+    COUNTROWS (
+        DATESBETWEEN ( 'Calendar'[Date], DATE(2014,1,1), DATE(2014,5,31) )
+    )
+RETURN
+DIVIDE ( TotalQty, NumDays, 0 )
+```
+
+- **DAX for Cumulative Outbound**
+```DAX
+CumOutBound = 
+VAR CurrentDate = MAX( ForecastCalendar[Date] )   -- giữ ngày của cột hiện tại
+VAR StartDate = DATE(2014,6,1)                    -- ngày bắt đầu forecast
+VAR DaysCount =
+    COUNTROWS(
+        FILTER(
+            ALL( ForecastCalendar ),
+            ForecastCalendar[Date] >= StartDate
+            && ForecastCalendar[Date] <= CurrentDate
+        )
+    )
+RETURN
+[AverageDailyDemand] * DaysCount
+```
+
+- **DAX for Cumulative Inbound**
+```DAX
+CumInBound = 
+VAR CurrentDate = MAX( ForecastCalendar[Date] )
+VAR StartDate = DATE(2014,6,1)
+RETURN
+CALCULATE(
+    SUM( WorkOrder[OrderQty] ),
+    FILTER(
+        ALL( ForecastCalendar ),
+        ForecastCalendar[Date] >= StartDate
+        && ForecastCalendar[Date] <= CurrentDate
+    )
+)
+```
+- **Forecast Inventory**
+```DAX
+ForecastInvent = 
+    [InventQty] + [CumInBound] - [CumOutBound]
+```
+🗝️ **Key Observation & Recommendation**
 
 - **Stock status**: ~48% of SKUs are below safety stock, ~33% are overstock, and only ~16% are “at stock” (out-of-stock is ~2–3%).
 - **Items running out**: Several SKUs are at risk of running out soon: **6 SKUs <10 days**, 18 SKUs in 11–30 days, 33 SKUs in 31–60 days.
@@ -247,13 +335,11 @@ StockStatus =
 - **Forecast Inventory**: Some items have order quantities beyond the average customer demand in this year, like Rear Deraileur, ML Headset, HL Fork, etc.
 
 -> Work Order and Purchase Order quantities must be modified to match the real customer demand this year.
+
 - **Items Quantity**: Several items with the stock at "0", many others cluster around small quantities (30–36), suggesting the item is at-risk or it might be removed from the company sale system.
 
-🧠 **Key Insight**
-- **Inventory balance is off**: simultaneous understock and overstock indicate safety stock / reorder rules aren’t tuned per SKU.
-- **Customer service risk**: although current out-of-stock % is low, the near-term risk pool could cause service disruptions.
-- **Capital tied in inventory**: overstocked SKUs represent locked capital and will increase if large refills occur.
-- **Forecasts are useful**: the model can detect refill spikes and help avoid surprise capital swings if operationalized.
+-> Re-check for company order policy or Discontinued product still appears in the inventory list.
+
 
 **C. Excess Storage & Needing Refill**
 
@@ -261,9 +347,9 @@ StockStatus =
 
 🗝️ **Key Observation**
 
-- Total excess value ≈ $177.6K (2.45% of inventory value) while value needed for refill ≈ $2.33M and missing value = 32.2% → refill needs are much larger than excess value.
+- Total **excess value** ≈ $177.6K (2.45% of inventory value) while **value needed for refill** ≈ $2.33M and missing value = 32.2% → refill needs are much larger than excess value.
 
-- Share of overstock ≈ 33%, understock ≈ 51% — more SKUs are understocked than overstocked.
+- Share of **overstock** ≈ 33%, **understock** ≈ 51% — more SKUs are understocked than overstocked.
 
 - Left list: top SKUs contributing to excess value (each ~5–13K).
 
@@ -271,10 +357,8 @@ StockStatus =
 
 🧠 **Key Insight**
 
-- Mismatch of capital flow: a relatively small pool of overstock value cannot offset the very large refill needs — purchasing will drive working capital up unless controlled.
+- **Mismatch of capital flow**: a relatively small pool of overstock value cannot offset the very large refill needs — purchasing will drive working capital up unless controlled.
 
-- Uneven SKU priorities: top contributors to excess value are not necessarily the ones that require the most refill money; replenishment rules are not aligned to SKU value/velocity.
+- **Refill spikes risk over-capitalization**: items with >200% refill ratio likely come from batch POs or minimum order quantities (case-pack) and will create sudden capital commitments.
 
-- Refill spikes risk over-capitalization: items with >200% refill ratio likely come from batch POs or minimum order quantities (case-pack) and will create sudden capital commitments.
-
-- High business risk: the combination of many understocked SKUs and a few large refill amounts raises both stockout risk and sudden cash pressure.
+- **High business risk**: the combination of many understocked SKUs and a few large refill amounts raises both stockout risk and sudden cash pressure.
