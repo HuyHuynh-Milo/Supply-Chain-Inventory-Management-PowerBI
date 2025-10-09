@@ -1,5 +1,8 @@
 # Supply-Chain-Inventory-Management-PowerBI
 🏭This project was created to fulfill the needs of inventory management: keep track of the storage quantity, value, as well as fully control inventory status such as stockout, excess stock. The Dashboard performs in Power BI application with many usage of DAX and Power Query, BigQuery, and SQL are also used to query the dataset.
+
+👉 Check out my **publish Dashboard**: [Dashboard](https://app.powerbi.com/view?r=eyJrIjoiZDA1YjlhMzctNjg3Ni00N2Q0LTlhZWQtNzAxZjJlOTIwMWQ4IiwidCI6ImFhNDI5ZTcxLTQwZWMtNGU5Yy1iOTg4LWQwY2I1ZTAzODVlZCIsImMiOjEwfQ%3D%3D)
+
 ![Cover image](https://github.com/user-attachments/assets/9d4ddbd8-1880-4913-b3aa-a68cc20fea1e)
 - Author: Huy Huynh
 - Date: September 2025
