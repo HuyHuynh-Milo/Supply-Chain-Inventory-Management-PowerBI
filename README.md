@@ -240,26 +240,26 @@ RETURN BelowSafe + OutStock
 -> This critical imbalance results in a ratio of instability **(Below Safety + Out Stock)** to stability **(At Stock)** of **3.2:1** 
 
 **2. Cash-out threat** 
-- Inventory requirements indicate a necessary capital injection; the "Refill Value" of **$2.3M** represents **31.9%** of the total current inventory valuation.
+- Inventory requirements indicate a necessary capital injection; the **Refill Value** of **$2.3M** represents **31.9%** of the total current inventory valuation.
 
--> The safety stock policy and demand forecast should be adjusted to improve inventory replenishment efficiency.
+-> The safety stock **policy** and demand **forecast** should be adjusted to improve **inventory replenishment** efficiency.
 
 **3. High financial risk concentrated in bikes**
-- The $7.24M inventory portfolio demonstrates extreme financial concentration; the Bike category constitutes the majority of asset value: **$7.06M, or **97.5%** of the total inventory value.
+- The **$7.24M** inventory portfolio demonstrates extreme **financial concentration**; the **Bike category** constitutes the majority of asset value: **$7.06M, or **97.5%** of the total inventory value.
 - Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder.
   
--> The company's entire asset base is exposed to bicycle market risk: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
+-> The company's entire asset base is exposed to **bicycle market risk**: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
 
 **4. Interpreting Inventory Turnover**
 - The Overall Inventory turnover stands at **6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
 - Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
 
--> Overall, a turnover **above 6** indicates that inventory management practices are **effective**. The focus going forward should be on **maintaining** this turnover while preventing stockouts in fast-moving categories like the Accessories.
+-> Overall, a turnover **above 6** indicates that inventory management practices are **effective**. The focus going forward should be on **maintaining** this **turnover** while preventing stockouts in fast-moving categories like the Accessories.
 
 **5. Opportunity in overstocked categories.**
-- Clothing and Accessories show high overstock percentages (per-SKU), more than **91%** items are overstock.
+- Clothing and Accessories show **high overstock** percentages (per-SKU), more than **91%** items are overstock.
 
--> Yet they represent a tiny portion of total value — good candidates for working-capital recovery through promotions/redistribution.
+-> Yet they represent a **tiny portion** of total value — good candidates for working-capital recovery through promotions/redistribution.
 
 **B. Availability & Forecast**
 
