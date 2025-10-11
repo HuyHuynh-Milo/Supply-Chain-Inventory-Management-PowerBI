@@ -94,7 +94,7 @@ ORDER BY sd.SalesOrderDetailID
 ### 📬 Using Dataset (Data Dictionary)
 
 A quick overview of these tables:
-- **Product** table:
+- 📋 **Product** table:
 
 | Column Name              | Data Type          | Description                                                                                                                          | Example Value            |
 | ------------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
@@ -107,7 +107,7 @@ A quick overview of these tables:
 | **FinishedGoodsFlag**    | `int`              | Indicates whether the product is a finished good (`1`) or a component/sub-assembly (`0`).                                            | 1                        |
 | **ProductSubcategoryID** | `int` *(nullable)* | References the product’s subcategory in the `Production.ProductSubcategory` table. Helps group products by type.                     | 14                       |
 
-- **Category** table:
+- 🗒️ **Category** table:
 
 | Column Name                           | Data Type      | Description                                                                                                                                                              | Example Value    |
 | ------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
@@ -116,7 +116,7 @@ A quick overview of these tables:
 | **ProductCategoryID**                 | `int`          | Foreign key linking the subcategory to its parent category in the `ProductCategory` table.                                                                               | 1                |
 | **Category** *(alias for pc.Name)*    | `nvarchar(50)` | The name of the higher-level product category (e.g., “Bikes”, “Accessories”).                                                                                            | *Bikes*          |
 
-- **WorkOrder** Table:
+- 🗂️ **WorkOrder** Table:
 
 | Column Name     | Data Type               | Description                                                                                       | Example Value       |
 | --------------- | ----------------------- | ------------------------------------------------------------------------------------------------- | ------------------- |
@@ -127,7 +127,7 @@ A quick overview of these tables:
 | **EndDate**     | `datetime` *(nullable)* | The date when production was completed. May be `NULL` if the work order is still in progress.     | 2020-07-20 00:00:00 |
 | **DueDate**     | `datetime`              | The planned completion date for the work order, used to track delays or early completions.        | 2020-07-22 00:00:00 |
 
-- **Inventory** Table:
+- 💼 **Inventory** Table:
 
 | Column Name                        | Data Type      | Description                                                                                                             | Example Value            |
 | ---------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------ |
@@ -137,7 +137,7 @@ A quick overview of these tables:
 | **Location** *(alias for pl.Name)* | `nvarchar(50)` | Descriptive name of the inventory location, such as a warehouse or sub-assembly area.                                   | *Finished Goods Storage* |
 | **ModifiedDate**                   | `datetime`     | Date and time when this inventory record was last updated — used for tracking stock changes.                            | 2020-09-12 00:00:00      |
 
-- **SaleOrder** Table:
+- 🗃️ **SaleOrder** Table:
 
 | Column Name                                      | Data Type       | Description                                                                                                              | Example Value       |
 | ------------------------------------------------ | --------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------- |
@@ -152,14 +152,14 @@ A quick overview of these tables:
 
 - The Product table is the main table that connects to 3 other tables by the key ***ProductID***. With an exception for the category table, they are connected by the **ProductSubcategoryID**
 
-## 3. Main process in Power BI
+## 	📊 3. Main process in Power BI
 
 ### 1. ⚒️ Preprocessing Data
-**a. Dataset & Preprocessing explanation**
+**🗡️ a. Dataset & Preprocessing explanation**
 - This dataset doesn't have the stock quantity during the time period, so i'll hypothesize that the dataset ends its record on 31-May and the calculations like Stock Quantity, Value, Status,... are at that time.
 - Every calculation after the end of May (like work order) is my Forecast for future demand.
 
-**b. Inventory Turnover**
+**🪛 b. Inventory Turnover**
 - The Inventory Turnover is gonna be calculated by approximation (due to the lack of stock quantity for the time period):
 
   <img width="427" height="77" alt="image" src="https://github.com/user-attachments/assets/e6ce4999-a075-4fe5-82fd-fd66ddd039a0" />
@@ -174,7 +174,7 @@ VAR COGS = CALCULATE(
 RETURN DIVIDE(COGS,[InventValue])
 ```
 
-**c. Stock Status**
+**🧰 c. Stock Status**
 - **At Stock** is the range of item quantity from **Safety Stock -> SafetyStock * 1.3**
 - **Excess-Stock** is everything above the Maximum At-Stock
 - **Below safety** are everything below the safety point.
@@ -189,7 +189,7 @@ StockStatus =
         "Over Stock"
         )
 ```
-**d. Excess Value**
+**📡 d. Excess Value**
 ```DAX
 ExcessValue = CALCULATE(
     SUMX(
@@ -198,7 +198,7 @@ ExcessValue = CALCULATE(
     FILTER(Inventory, Inventory[IsOverStock] = 1)
     )
 ```
-**e. Refill Value**
+**🔭 e. Refill Value**
 ```DAX
 RefillValue = 
 VAR BelowSafe = CALCULATE(
@@ -211,14 +211,14 @@ VAR OutStock = CALCULATE(
     )
 RETURN BelowSafe + OutStock
 ```
-**f. Table Connection**
+**🔗 f. Table Connection**
 - I create a Calendar table for datetime calculation and a Forecast Calendar for forecasting future inventory.
 
 <img width="1663" height="1321" alt="image" src="https://github.com/user-attachments/assets/8ca51742-7638-4345-820b-16e560b50a6a" />
 
 
 ### 2. 📈 Dashboard
-**A. Overview**
+**🔭 A. Overview**
 
 <img width="2556" height="1424" alt="image" src="https://github.com/user-attachments/assets/24f8dd34-57f0-4667-a14e-b9ba82afeb4d" />
 
@@ -233,35 +233,35 @@ RETURN BelowSafe + OutStock
 
 🧠 **Key Insight & Recommendation**
 
-**1.Stock-out risk**
+**🛗 1.Stock-out risk**
 - The total inventory asset base comprises 151 individual items totaling a Quantity of 17K units, collectively valued at $7.24M.
 - A minitory of items are maintained at stock levels: **24 tiems (15.9%)** At Stock. However, more than **50.9%** of the portfolio is either Below Safety **(73 items)** or Out-stock **(4 items)**.
  
 -> This critical imbalance results in a ratio of instability **(Below Safety + Out Stock)** to stability **(At Stock)** of **3.2:1** 
 
-**2. Cash-out threat** 
+**🪟 2. Cash-out threat** 
 - Inventory requirements indicate a necessary capital injection; the **Refill Value** of **$2.3M** represents **31.9%** of the total current inventory valuation.
 
 -> The safety stock **policy** and demand **forecast** should be adjusted to improve **inventory replenishment** efficiency.
 
-**3. High financial risk concentrated in bikes**
+**🛒 3. High financial risk concentrated in bikes**
 - The **$7.24M** inventory portfolio demonstrates extreme **financial concentration**; the **Bike category** constitutes the majority of asset value: **$7.06M, or **97.5%** of the total inventory value.
 - Clothing accounts for **$0.14M (1.9%)** and Accessories constitute the **negligible** remainder.
   
 -> The company's entire asset base is exposed to **bicycle market risk**: unexpected shift in demand for model, competitive pricing pressure, and change in sourcing cost.
 
-**4. Interpreting Inventory Turnover**
+**🚿 4. Interpreting Inventory Turnover**
 - The Overall Inventory turnover stands at **6.04**, indicating that the average capital holding cycle of approximately **61 days** (365/6.04).
 - Accessories achieved the highest turnover at **10.96**, suggesting very strong sales velocity and lean inventory management. Clothing followed at **7.34**, showing stable movement aligned with seasonal demand. Bikes recorded a turnover of **5.26** — slightly slower but still within an acceptable range for high-value.
 
 -> Overall, a turnover **above 6** indicates that inventory management practices are **effective**. The focus going forward should be on **maintaining** this **turnover** while preventing stockouts in fast-moving categories like the Accessories.
 
-**5. Opportunity in overstocked categories.**
+**🧪 5. Opportunity in overstocked categories.**
 - Clothing and Accessories show **high overstock** percentages (per-SKU), more than **91%** items are overstock.
 
 -> Yet they represent a **tiny portion** of total value — good candidates for working-capital recovery through promotions/redistribution.
 
-**B. Availability & Forecast**
+**📆 B. Availability & Forecast**
 
 <img width="1513" height="850" alt="image" src="https://github.com/user-attachments/assets/86e40fc7-5f32-46f6-8029-56ecfc0e3716" />
 
@@ -344,7 +344,7 @@ ForecastInvent =
 -> Re-check for company order policy or Discontinued product still appears in the inventory list.
 
 
-**C. Excess Storage & Needing Refill**
+**💼 C. Excess Storage & Needing Refill**
 
 <img width="1514" height="845" alt="image" src="https://github.com/user-attachments/assets/c4b510a8-2601-4a07-83f4-05c6fab7b692" />
 
